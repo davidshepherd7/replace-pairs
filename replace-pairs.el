@@ -4,7 +4,7 @@
 
 ;; Author: David Shepherd <davidshepherd7@gmail.com>
 ;; Version: 0.1
-;; Package-Requires: ((dash "2.10.0") (emacs "24.4"))
+;; Package-Requires: ((emacs "24.4"))
 ;; Keywords:
 ;; URL: https://github.com/davidshepherd7/replace-pairs
 
@@ -16,7 +16,6 @@
 
 ;; TODO: handle closing pair, full pair as input
 
-(require 'dash)
 (require 'rx)
 
 
@@ -37,17 +36,17 @@ pair, e.g. ( -> (, ) -> (, () -> (.
 
 (defun replace-pairs-add-pair (open close)
   "Add a new pair to be recognised by replace-pairs"
-  (-each (list open close (concat open close))
-    (lambda (x)
-      (puthash x close replace-pairs--closings-table)
-      (puthash x open replace-pairs--openings-table))))
+  (dolist (x (list open close (concat open close)))
+    (puthash x close replace-pairs--closings-table)
+    (puthash x open replace-pairs--openings-table)))
 
-(-each '(("(" . ")")
-         ("[" . "]")
-         ("{" . "}")
-         ("<" . ">")
-         )
-  (-lambda ((open . close)) (replace-pairs-add-pair open close)))
+;; Add default pairs
+(dolist (x '(("(" . ")")
+             ("[" . "]")
+             ("{" . "}")
+             ("<" . ">")
+             ))
+  (replace-pairs-add-pair (car x) (cdr x)))
 
 
 (defun replace-pairs-closing (item)
