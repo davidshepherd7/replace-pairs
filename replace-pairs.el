@@ -63,21 +63,28 @@ pair, e.g. ( -> (, ) -> (, () -> (.
         (t (error "No regex match data found, this should never happen"))))
 
 
-;; Main function
+;; Main functions
 
-(defun replace-pairs (from-item to-item delimited start end backward)
+(defun replace-pairs--do-replace (from-item to-item query-flag delimited start end backward)
+  (let ((regexp (rx-to-string `(or (group ,(replace-pairs--opening from-item))
+                                   (group ,(replace-pairs--closing from-item)))))
+        (replacement (cons #'replace-pairs--choose-replacement to-item)))
+    (perform-replace regexp replacement query-flag t delimited nil nil start end backward)))
+
+
+(defun query-replace-pairs (from-item to-item delimited start end backward)
   "Query-replace pairs of things
 
 For example replace `(' and `)' with `[' and `]' respectively.
 
 Interface is identical to `query-replace'."
-  ;; Interactive form stolen directly from replace-regexp in emacs 24.4.
+  ;; Interactive form stolen directly from query-replace-regexp in emacs 24.4.
   (interactive
    (let ((common
           (query-replace-read-args
            (concat "Query replace pairs"
                    (if current-prefix-arg
-                       (if (eq current-prefix-arg '-) " backward" "")
+                       (if (eq current-prefix-arg '-) " backward" " word")
                      "")
                    (if (and transient-mark-mode mark-active) " in region" ""))
            t)))
@@ -91,10 +98,33 @@ Interface is identical to `query-replace'."
                (region-end))
            (nth 3 common))))
 
-  (let ((regexp (rx-to-string `(or (group ,(replace-pairs--opening from-item))
-                                   (group ,(replace-pairs--closing from-item)))))
-        (replacement (cons #'replace-pairs--choose-replacement to-item)))
-    (perform-replace regexp replacement t t delimited nil nil start end backward)))
+  ;; Do it
+  (replace-pairs--do-replace from-item to-item t delimited start end backward))
+
+(defun replace-pairs (from-item to-item &optional delimited start end backward)
+  "Replace pairs of things
+
+For example replace `(' and `)' with `[' and `]' respectively.
+
+Interface is identical to `replace-string'."
+  (interactive
+   (let ((common
+          (query-replace-read-args
+           (concat "Replace pairs"
+                   (if current-prefix-arg
+                       (if (eq current-prefix-arg '-) " backward" " word")
+                     "")
+                   (if (and transient-mark-mode mark-active) " in region" ""))
+           nil)))
+     (list (nth 0 common) (nth 1 common) (nth 2 common)
+           (if (and transient-mark-mode mark-active)
+               (region-beginning))
+           (if (and transient-mark-mode mark-active)
+               (region-end))
+           (nth 3 common))))
+
+  ;; Do it
+  (replace-pairs--do-replace from-item to-item nil delimited start end backward))
 
 
 

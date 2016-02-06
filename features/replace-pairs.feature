@@ -43,3 +43,9 @@ Feature: Replace pairs
     When I add a new pair "@", "~"
     And I replace-pairs "@" -> "{" in buffer
     Then I should see "{ hello world }"
+
+  Scenario: Query replace [ to (
+    Given I insert "argle [ hello world ] foo bar "
+    When I query-replace-pairs "[" -> ")" in buffer
+    Then I should see "( hello world )"
+    Then I should not see "!"
