@@ -1,4 +1,4 @@
-;;; replace-pairs.el --- Find-replace pairs of things -*- lexical-binding: t; -*-
+;;; replace-pairs.el --- Query-replace pairs of things -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2015 Free Software Foundation, Inc.
 
@@ -20,17 +20,10 @@
 ;; Data structures
 
 (defvar replace-pairs--closings-table (make-hash-table :test #'equal)
-  "Private hash table, only modify via `replace-pairs-add-pair'
-
-Contains mappings from an item of a pair to it's opposite.
-")
+  "Private hash table, only modify via `replace-pairs-add-pair'")
 
 (defvar replace-pairs--openings-table (make-hash-table :test #'equal)
-  "Private hash table, only modify via `replace-pairs-add-pair'
-
-Contains mappings from pair items to the oppening part of the
-pair, e.g. ( -> (, ) -> (, () -> (.
-")
+  "Private hash table, only modify via `replace-pairs-add-pair'")
 
 (defun replace-pairs-add-pair (open close)
   "Add a new pair to be recognised by replace-pairs"
