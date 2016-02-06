@@ -1,2 +1,3 @@
 /.cask/
 /replace-pairs.elc
+/.ecukes-failing-scenarios
