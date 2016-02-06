@@ -10,11 +10,9 @@
 
 ;;; Commentary:
 
-;; TODO: write something here
+;; Query replace pairs of things with a single command.
 
 ;;; Code:
-
-;; TODO: handle closing pair, full pair as input
 
 (require 'rx)
 
@@ -68,14 +66,19 @@ pair, e.g. ( -> (, ) -> (, () -> (.
 ;; Main function
 
 (defun replace-pairs (from-item to-item delimited start end backward)
+  "Query-replace pairs of things
+
+For example replace `(' and `)' with `[' and `]' respectively.
+
+Interface is identical to `query-replace'."
+  ;; Interactive form stolen directly from replace-regexp in emacs 24.4.
   (interactive
    (let ((common
           (query-replace-read-args
-           (concat "Query replace"
+           (concat "Query replace pairs"
                    (if current-prefix-arg
-                       (if (eq current-prefix-arg '-) " backward" " word")
+                       (if (eq current-prefix-arg '-) " backward" "")
                      "")
-                   " regexp"
                    (if (and transient-mark-mode mark-active) " in region" ""))
            t)))
      (list (nth 0 common) (nth 1 common) (nth 2 common)
