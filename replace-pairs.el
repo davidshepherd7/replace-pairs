@@ -4,7 +4,7 @@
 
 ;; Author: David Shepherd <davidshepherd7@gmail.com>
 ;; Version: 0.1
-;; Package-Requires: ((dash "2.10.0") (names "20150618.0") (emacs "24.4"))
+;; Package-Requires: ((dash "2.10.0") (emacs "24.4"))
 ;; Keywords:
 ;; URL: https://github.com/davidshepherd7/replace-pairs
 
@@ -16,15 +16,24 @@
 
 ;; TODO: single ecukes step to execute function
 
+;; TODO: handle closing pair, full pair as input
+
 (require 'dash)
 (require 'rx)
 
+
+;; Data structures
 
-(defvar replace-pairs-pair-table (make-hash-table :test #'equal))
+(defvar replace-pairs--opposites-table (make-hash-table :test #'equal)
+  "Private hash table, only modify via `replace-pairs-add-pair'
+
+Contains mappings from an item of a pair to it's opposite.
+")
 
 (defun replace-pairs-add-pair (open close)
-  (puthash open close replace-pairs-pair-table)
-  (puthash close open replace-pairs-pair-table))
+  "Add a new pair to be recognised by replace-pairs"
+  (puthash open close replace-pairs--opposites-table)
+  (puthash close open replace-pairs--opposites-table))
 
 (-each '(("(" . ")")
          ("[" . "]")
@@ -35,15 +44,17 @@
 
 
 (defun replace-pairs-opposite (opening)
-  (or (gethash opening replace-pairs-pair-table)
-      (error (concat "Opposite of " opening " not found"))))
+  (or (gethash opening replace-pairs--opposites-table)
+      (error "Opposite of %s not found" opening)))
 
 
 (defun replace-pairs-choose-replacement (opening dummy)
   (cond ((match-string 1) opening)
         ((match-string 2) (replace-pairs-opposite opening))
-        (t (error "No match found"))))
+        (t (error "No regex match data found, this should never happen"))))
 
+
+;; Main function
 
 (defun replace-pairs (from-item to-item delimited start end backward)
   (interactive
