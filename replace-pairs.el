@@ -10,68 +10,68 @@
 
 ;;; Commentary:
 
-;; TODO
+;; TODO: write something here
 
 ;;; Code:
 
+;; TODO: single ecukes step to execute function
+
 (require 'dash)
-(require 'names)
-
-;; namespacing using names.el:
-;;;###autoload
-(define-namespace replace-pairs-
-
-;; Tell names that it's ok to expand things inside these threading macros.
-:functionlike-macros (-->)
-
-(defun replace-pairs ()
-  (query-replace-regexp "(\\|)" "\\,")
-  )
+(require 'rx)
 
 
-)
+(defvar replace-pairs-pair-table (make-hash-table :test #'equal))
+
+(defun replace-pairs-add-pair (open close)
+  (puthash open close replace-pairs-pair-table)
+  (puthash close open replace-pairs-pair-table))
+
+(-each '(("(" . ")")
+         ("[" . "]")
+         ("{" . "}")
+         ("<" . ">")
+         )
+  (-lambda ((open . close)) (replace-pairs-add-pair open close)))
+
+
+(defun replace-pairs-opposite (opening)
+  (or (gethash opening replace-pairs-pair-table)
+      (error (concat "Opposite of " opening " not found"))))
+
+
+(defun replace-pairs-choose-replacement (opening dummy)
+  (cond ((match-string 1) opening)
+        ((match-string 2) (replace-pairs-opposite opening))
+        (t (error "No match found"))))
+
+
+(defun replace-pairs (from-item to-item delimited start end backward)
+  (interactive
+   (let ((common
+          (query-replace-read-args
+           (concat "Query replace"
+                   (if current-prefix-arg
+                       (if (eq current-prefix-arg '-) " backward" " word")
+                     "")
+                   " regexp"
+                   (if (and transient-mark-mode mark-active) " in region" ""))
+           t)))
+     (list (nth 0 common) (nth 1 common) (nth 2 common)
+           ;; These are done separately here
+           ;; so that command-history will record these expressions
+           ;; rather than the values they had this time.
+           (if (and transient-mark-mode mark-active)
+               (region-beginning))
+           (if (and transient-mark-mode mark-active)
+               (region-end))
+           (nth 3 common))))
+
+  (let ((regexp (rx-to-string `(or (group ,from-item)
+                                   (group ,(replace-pairs-opposite from-item)))))
+        (replacement (cons #'replace-pairs-choose-replacement to-item)))
+    (perform-replace regexp replacement t t delimited nil nil start end backward)))
+
 
 (provide 'replace-pairs)
 
 ;;; replace-pairs.el ends here
-
-;; (defun xah-change-bracket-pairs (beg end φfromType φtoType)
-;;   "Change bracket pairs from one type to another on current line or selection.
-
-;; For example, change all parenthesis () to square brackets [].
-
-;; When called in lisp program, beg end are region begin/end
-;; position, φfromType or φtoType is a string of a bracket pair. ⁖
-;; \"()\", \"[]\", etc. URL
-;; `http://ergoemacs.org/emacs/elisp_change_brackets.html' Version
-;; 2015-04-12"
-;;   (interactive
-;;    (let ((ξbracketsList
-;;           '("()" "{}" "[]" "<>" "“”" "‘’" "‹›" "«»" "「」" "『』" "【】" "〖〗" "〈〉" "《》" "〔〕" "⦅⦆" "〚〛" "⦃⦄" "〈〉" "⦑⦒" "⧼⧽" "⟦⟧" "⟨⟩" "⟪⟫" "⟮⟯" "⟬⟭" "❛❜" "❝❞" "❨❩" "❪❫" "❴❵" "❬❭" "❮❯" "❰❱")))
-;;      (if (use-region-p)
-;;          (progn (list
-;;                  (region-beginning)
-;;                  (region-end)
-;;                  (ido-completing-read "Replace this:" ξbracketsList )
-;;                  (ido-completing-read "To:" ξbracketsList )))
-;;        (progn
-;;          (list
-;;           (line-beginning-position)
-;;           (line-end-position)
-;;           (ido-completing-read "Replace this:" ξbracketsList )
-;;           (ido-completing-read "To:" ξbracketsList ))))))
-;;   (let* (
-;;          (ξfindReplaceMap
-;;           (vector
-;;            (vector (char-to-string (elt φfromType 0)) (char-to-string (elt φtoType 0)))
-;;            (vector (char-to-string (elt φfromType 1)) (char-to-string (elt φtoType 1))))))
-;;     (save-excursion
-;;       (save-restriction
-;;         (narrow-to-region beg end)
-;;         (let ( (case-fold-search nil))
-;;           (mapc
-;;            (lambda (ξx)
-;;              (goto-char (point-min))
-;;              (while (search-forward (elt ξx 0) nil t)
-;;                (replace-match (elt ξx 1) 'FIXEDCASE 'LITERAL)))
-;;            ξfindReplaceMap))))))
