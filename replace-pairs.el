@@ -14,8 +14,6 @@
 
 ;;; Code:
 
-;; TODO: single ecukes step to execute function
-
 ;; TODO: handle closing pair, full pair as input
 
 (require 'dash)
