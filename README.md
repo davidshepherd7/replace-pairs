@@ -2,15 +2,17 @@
 
 [![travis](https://travis-ci.org/davidshepherd7/replace-pairs.svg?branch=master)](https://travis-ci.org/davidshepherd7/replace-pairs) [![GPLv3](http://img.shields.io/badge/license-GNU%20GPLv3-blue.svg)](https://github.com/davidshepherd7/replace-pairs/blob/master/LICENSE)
 
-Query replace pairs of things with a single command. For example convert
+Find-replace pairs of things with a single command. For example convert
 
-    Foo(bar[X])
+    Foo[X]
+    Bar[X]
    
 to
 
-    Foo(bar<X>)
+    Foo(X)
+    Bar(X)
     
-with `M-x query-replace-pairs <RET> [ <RET> < <RET> !`, just like `query-replace` but recognising closing brackets as well.
+with `M-x query-replace-pairs <RET> [ <RET> ( <RET> !`, like a smarter `query-replace`.
 
 
 ## Features
