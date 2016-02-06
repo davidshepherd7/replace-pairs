@@ -24,3 +24,16 @@ Feature: Replace pairs
     Given I insert "argle [ hello world ] foo bar "
     When I replace-pairs "]" -> "(" in buffer
     Then I should see "( hello world )"
+
+
+  # Pairs as inputs
+  Scenario: Replace [] to (
+    Given I insert "argle [ hello world ] foo bar "
+    When I replace-pairs "[]" -> ")" in buffer
+    Then I should see "( hello world )"
+
+  Scenario: Replace [ to ()
+    Given I insert "argle [ hello world ] foo bar "
+    When I replace-pairs "[" -> "()" in buffer
+    Then I should see "( hello world )"
+

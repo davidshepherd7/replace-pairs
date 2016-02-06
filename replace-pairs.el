@@ -37,12 +37,10 @@ pair, e.g. ( -> (, ) -> (, () -> (.
 
 (defun replace-pairs-add-pair (open close)
   "Add a new pair to be recognised by replace-pairs"
-  (puthash open close replace-pairs--closings-table)
-  (puthash close close replace-pairs--closings-table)
-
-  (puthash open open replace-pairs--openings-table)
-  (puthash close open replace-pairs--openings-table)
-  )
+  (-each (list open close (concat open close))
+    (lambda (x)
+      (puthash x close replace-pairs--closings-table)
+      (puthash x open replace-pairs--openings-table))))
 
 (-each '(("(" . ")")
          ("[" . "]")
@@ -58,7 +56,7 @@ pair, e.g. ( -> (, ) -> (, () -> (.
 
 (defun replace-pairs-opening (opening)
   (or (gethash opening replace-pairs--openings-table)
-      (error "Oppening of %s not found" opening)))
+      (error "Opening of %s not found" opening)))
 
 
 (defun replace-pairs-choose-replacement (from-item dummy)
@@ -95,6 +93,7 @@ pair, e.g. ( -> (, ) -> (, () -> (.
         (replacement (cons #'replace-pairs-choose-replacement to-item)))
     (perform-replace regexp replacement t t delimited nil nil start end backward)))
 
+
 
 (provide 'replace-pairs)
 
