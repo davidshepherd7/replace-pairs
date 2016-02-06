@@ -49,18 +49,19 @@ pair, e.g. ( -> (, ) -> (, () -> (.
   (replace-pairs-add-pair (car x) (cdr x)))
 
 
-(defun replace-pairs-closing (item)
+(defun replace-pairs--closing (item)
   (or (gethash item replace-pairs--closings-table)
       (error "Closing of %s not found" item)))
 
-(defun replace-pairs-opening (opening)
+
+(defun replace-pairs--opening (opening)
   (or (gethash opening replace-pairs--openings-table)
       (error "Opening of %s not found" opening)))
 
 
-(defun replace-pairs-choose-replacement (from-item dummy)
-  (cond ((match-string 1) (replace-pairs-opening from-item))
-        ((match-string 2) (replace-pairs-closing from-item))
+(defun replace-pairs--choose-replacement (from-item dummy)
+  (cond ((match-string 1) (replace-pairs--opening from-item))
+        ((match-string 2) (replace-pairs--closing from-item))
         (t (error "No regex match data found, this should never happen"))))
 
 
@@ -87,9 +88,9 @@ pair, e.g. ( -> (, ) -> (, () -> (.
                (region-end))
            (nth 3 common))))
 
-  (let ((regexp (rx-to-string `(or (group ,(replace-pairs-opening from-item))
-                                   (group ,(replace-pairs-closing from-item)))))
-        (replacement (cons #'replace-pairs-choose-replacement to-item)))
+  (let ((regexp (rx-to-string `(or (group ,(replace-pairs--opening from-item))
+                                   (group ,(replace-pairs--closing from-item)))))
+        (replacement (cons #'replace-pairs--choose-replacement to-item)))
     (perform-replace regexp replacement t t delimited nil nil start end backward)))
 
 
