@@ -15,3 +15,7 @@
         (And "I press \"<return>\"")
         (And "I press \"!\"")
         (And "I execute the action chain")))
+
+(When "^I add a new pair \"\\([^\"]+\\)\", \"\\([^\"]+\\)\"$"
+      (lambda (open close)
+        (replace-pairs-add-pair open close)))

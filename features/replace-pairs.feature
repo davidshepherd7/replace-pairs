@@ -37,3 +37,9 @@ Feature: Replace pairs
     When I replace-pairs "[" -> "()" in buffer
     Then I should see "( hello world )"
 
+
+  Scenario: Adding a new pair
+    Given I insert "argle @ hello world ~ foo bar "
+    When I add a new pair "@", "~"
+    And I replace-pairs "@" -> "{" in buffer
+    Then I should see "{ hello world }"
