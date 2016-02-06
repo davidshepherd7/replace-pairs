@@ -10,15 +10,19 @@ to
 
     Foo(bar<X>)
     
-with `M-x replace-pairs <RET> [ <RET> < <RET> !`. 
-
-The interface (and keymap) is identical to `query-replace`.
+with `M-x replace-pairs <RET> [ <RET> < <RET> !`, just like `query-replace` but recognising closing brackets as well.
 
 
-Add new pairs with `replace-pairs-add-pair`, e.g. to add support for `{}`
-you would call:
+## Features
 
-    (replace-pairs-add-pair "{" "}")
+* The interface and keymap is identical to `query-replace`.
 
-from your config. Of course this is just an example, `{}` is already
-supported!
+* Add new pairs with `replace-pairs-add-pair`, e.g. to add support for `{}`
+  you would call:
+
+      (replace-pairs-add-pair "{" "}")
+
+  from your config. Of course this is just an example, `{}` is already
+  supported!
+  
+* Inputs `(`, `)` and `()` are recognised as the pair `()`.
