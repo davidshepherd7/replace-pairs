@@ -22,16 +22,27 @@
 
 ;; Data structures
 
-(defvar replace-pairs--opposites-table (make-hash-table :test #'equal)
+(defvar replace-pairs--closings-table (make-hash-table :test #'equal)
   "Private hash table, only modify via `replace-pairs-add-pair'
 
 Contains mappings from an item of a pair to it's opposite.
 ")
 
+(defvar replace-pairs--openings-table (make-hash-table :test #'equal)
+  "Private hash table, only modify via `replace-pairs-add-pair'
+
+Contains mappings from pair items to the oppening part of the
+pair, e.g. ( -> (, ) -> (, () -> (.
+")
+
 (defun replace-pairs-add-pair (open close)
   "Add a new pair to be recognised by replace-pairs"
-  (puthash open close replace-pairs--opposites-table)
-  (puthash close open replace-pairs--opposites-table))
+  (puthash open close replace-pairs--closings-table)
+  (puthash close close replace-pairs--closings-table)
+
+  (puthash open open replace-pairs--openings-table)
+  (puthash close open replace-pairs--openings-table)
+  )
 
 (-each '(("(" . ")")
          ("[" . "]")
@@ -41,14 +52,18 @@ Contains mappings from an item of a pair to it's opposite.
   (-lambda ((open . close)) (replace-pairs-add-pair open close)))
 
 
-(defun replace-pairs-opposite (opening)
-  (or (gethash opening replace-pairs--opposites-table)
-      (error "Opposite of %s not found" opening)))
+(defun replace-pairs-closing (item)
+  (or (gethash item replace-pairs--closings-table)
+      (error "Closing of %s not found" item)))
+
+(defun replace-pairs-opening (opening)
+  (or (gethash opening replace-pairs--openings-table)
+      (error "Oppening of %s not found" opening)))
 
 
-(defun replace-pairs-choose-replacement (opening dummy)
-  (cond ((match-string 1) opening)
-        ((match-string 2) (replace-pairs-opposite opening))
+(defun replace-pairs-choose-replacement (from-item dummy)
+  (cond ((match-string 1) (replace-pairs-opening from-item))
+        ((match-string 2) (replace-pairs-closing from-item))
         (t (error "No regex match data found, this should never happen"))))
 
 
@@ -75,8 +90,8 @@ Contains mappings from an item of a pair to it's opposite.
                (region-end))
            (nth 3 common))))
 
-  (let ((regexp (rx-to-string `(or (group ,from-item)
-                                   (group ,(replace-pairs-opposite from-item)))))
+  (let ((regexp (rx-to-string `(or (group ,(replace-pairs-opening from-item))
+                                   (group ,(replace-pairs-closing from-item)))))
         (replacement (cons #'replace-pairs-choose-replacement to-item)))
     (perform-replace regexp replacement t t delimited nil nil start end backward)))
 
