@@ -59,7 +59,7 @@ pair, e.g. ( -> (, ) -> (, () -> (.
       (error "Opening of %s not found" opening)))
 
 
-(defun replace-pairs--choose-replacement (from-item dummy)
+(defun replace-pairs--choose-replacement (from-item _)
   (cond ((match-string 1) (replace-pairs--opening from-item))
         ((match-string 2) (replace-pairs--closing from-item))
         (t (error "No regex match data found, this should never happen"))))
