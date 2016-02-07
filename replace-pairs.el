@@ -65,6 +65,7 @@
     (perform-replace regexp replacement query-flag t delimited nil nil start end backward)))
 
 
+;;;###autoload
 (defun query-replace-pairs (from-item to-item delimited start end backward)
   "Query-replace pairs of things
 
@@ -94,6 +95,7 @@ Interface is identical to `query-replace'."
   ;; Do it
   (replace-pairs--do-replace from-item to-item t delimited start end backward))
 
+;;;###autoload
 (defun replace-pairs (from-item to-item &optional delimited start end backward)
   "Replace pairs of things
 
