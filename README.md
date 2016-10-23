@@ -1,6 +1,6 @@
 # replace-pairs
 
-[![travis](https://travis-ci.org/davidshepherd7/replace-pairs.svg?branch=master)](https://travis-ci.org/davidshepherd7/replace-pairs) [![GPLv3](http://img.shields.io/badge/license-GNU%20GPLv3-blue.svg)](https://github.com/davidshepherd7/replace-pairs/blob/master/LICENSE)
+[![travis](https://travis-ci.org/davidshepherd7/replace-pairs.svg?branch=master)](https://travis-ci.org/davidshepherd7/replace-pairs)
 
 Find-replace pairs of things with a single command. For example convert
 
